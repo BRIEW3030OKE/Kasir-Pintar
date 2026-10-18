@@ -1,0 +1,1238 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#080d1b" />
+    <meta
+      name="description"
+      content="Dashboard kasir interaktif untuk eksplorasi dataset dan analisis algoritma."
+    />
+    <title>Kasir Pintar — Algorithm Lab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+            },
+            colors: {
+              ink: "#080d1b",
+              panel: "#111a2d",
+              violet: "#8b7bff",
+              cyan: "#4de1df",
+              mint: "#5ce6b2",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="min-h-screen md:flex">
+      <aside
+        class="sidebar z-20 flex w-full flex-col md:fixed md:inset-y-0 md:w-[248px]"
+      >
+        <div class="flex items-center gap-3 px-5 py-5">
+          <div
+            class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-violet-400 to-cyan-300 text-slate-950 shadow-lg shadow-violet-500/20"
+          >
+            <i data-lucide="scan-line" class="h-5 w-5"></i>
+          </div>
+          <div>
+            <div class="text-sm font-bold tracking-wide">
+              Kasir<span class="text-cyan">Pintar</span>
+            </div>
+            <div class="mono mt-0.5 text-[9px] tracking-[.18em] text-slate-500">
+              ALGORITHM LAB
+            </div>
+          </div>
+        </div>
+        <div
+          class="mx-4 mb-4 hidden rounded-xl border border-white/[.07] bg-white/[.025] px-3 py-3 md:block"
+        >
+          <div class="flex items-center justify-between">
+            <span
+              class="mono text-[9px] uppercase tracking-[.15em] text-slate-500"
+              >System status</span
+            >
+            <span class="flex items-center gap-2 text-[10px] text-mint"
+              ><span class="pulse-dot h-1.5 w-1.5 rounded-full bg-mint"></span
+              >Online</span
+            >
+          </div>
+        </div>
+        <nav
+          aria-label="Navigasi utama"
+          class="flex gap-1 overflow-x-auto px-3 pb-3 md:flex-col md:overflow-visible"
+        >
+          <button
+            class="nav-link active flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 text-left text-xs font-medium"
+            data-page="dashboard"
+          >
+            <i data-lucide="layout-dashboard" class="h-4 w-4"></i>Overview
+          </button>
+          <button
+            class="nav-link flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 text-left text-xs font-medium"
+            data-page="dataset"
+          >
+            <i data-lucide="database" class="h-4 w-4"></i>Dataset
+          </button>
+          <button
+            class="nav-link flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 text-left text-xs font-medium"
+            data-page="iteration"
+          >
+            <i data-lucide="repeat-2" class="h-4 w-4"></i>Iterasi vs Rekursi
+          </button>
+          <button
+            class="nav-link flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 text-left text-xs font-medium"
+            data-page="sorting"
+          >
+            <i data-lucide="bar-chart-3" class="h-4 w-4"></i>Benchmark Sorting
+          </button>
+          <button
+            class="nav-link flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 text-left text-xs font-medium"
+            data-page="report"
+          >
+            <i data-lucide="file-chart-column-increasing" class="h-4 w-4"></i
+            >Analisis & Laporan
+          </button>
+        </nav>
+        <div class="mt-auto hidden p-4 md:block">
+          <div
+            class="rounded-xl border border-violet-400/10 bg-violet-400/[.04] p-3"
+          >
+            <div
+              class="flex items-center gap-2 text-[11px] font-semibold text-slate-300"
+            >
+              <i data-lucide="cpu" class="h-3.5 w-3.5 text-violet-300"></i
+              >Worker ready
+            </div>
+            <p class="mt-1.5 text-[10px] leading-relaxed text-slate-500">
+              Komputasi berat berjalan di thread terpisah agar UI tetap
+              responsif.
+            </p>
+          </div>
+          <p class="mono mt-4 text-[9px] text-slate-600">
+            UTS · PEMROGRAMAN LANJUTAN
+          </p>
+        </div>
+      </aside>
+
+      <main class="min-w-0 flex-1 md:ml-[248px]">
+        <header
+          class="sticky top-0 z-10 flex items-center justify-between border-b border-white/[.06] bg-[#080d1b]/75 px-5 py-3 backdrop-blur-xl sm:px-8"
+        >
+          <div
+            class="flex min-w-0 items-center gap-2 text-[11px] text-slate-500"
+          >
+            <span>Workspace</span
+            ><i data-lucide="chevron-right" class="h-3 w-3"></i
+            ><span id="breadcrumb" class="truncate text-slate-300"
+              >Overview</span
+            >
+          </div>
+          <div class="flex items-center gap-3">
+            <div
+              class="hidden items-center gap-2 rounded-full border border-white/[.07] px-2.5 py-1.5 sm:flex"
+            >
+              <span class="h-1.5 w-1.5 rounded-full bg-mint"></span
+              ><span id="worker-status" class="mono text-[9px] text-slate-400"
+                >WORKER IDLE</span
+              >
+            </div>
+            <div
+              class="grid h-8 w-8 place-items-center rounded-full border border-violet-300/20 bg-violet-400/10 text-[10px] font-bold text-violet-200"
+            >
+              KP
+            </div>
+          </div>
+        </header>
+
+        <div class="mx-auto max-w-[1500px] p-4 sm:p-7 lg:p-9">
+          <section id="page-dashboard" class="page active">
+            <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <div class="eyebrow mb-2">MONITORING / 01</div>
+                <h1 class="text-2xl font-bold tracking-tight sm:text-3xl">
+                  Selamat datang di
+                  <span
+                    class="bg-gradient-to-r from-violet-300 to-cyan-200 bg-clip-text text-transparent"
+                    >Algorithm Lab</span
+                  >
+                </h1>
+                <p class="mt-2 max-w-xl text-xs leading-relaxed text-slate-400">
+                  Eksplorasi performa kasir pintar melalui data transaksi,
+                  strategi algoritma, dan analisis yang terukur.
+                </p>
+              </div>
+              <button
+                class="primary-btn flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-bold"
+                data-goto="dataset"
+              >
+                <i data-lucide="database" class="h-4 w-4"></i>Kelola dataset
+              </button>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <article class="glass rounded-2xl p-5">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] text-slate-400">Total transaksi</span
+                  ><i data-lucide="receipt" class="h-4 w-4 text-violet-300"></i>
+                </div>
+                <div id="overview-count" class="mt-4 text-2xl font-bold">0</div>
+                <div class="mt-1 text-[10px] text-slate-500">
+                  Data tersimpan di sesi ini
+                </div>
+              </article>
+              <article class="glass rounded-2xl p-5">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] text-slate-400">Nilai penjualan</span
+                  ><i data-lucide="wallet" class="h-4 w-4 text-cyan"></i>
+                </div>
+                <div id="overview-sales" class="mt-4 text-2xl font-bold">
+                  Rp0
+                </div>
+                <div class="mt-1 text-[10px] text-slate-500">
+                  Akumulasi seluruh transaksi
+                </div>
+              </article>
+              <article class="glass rounded-2xl p-5">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] text-slate-400">Sort tercepat</span
+                  ><i data-lucide="zap" class="h-4 w-4 text-mint"></i>
+                </div>
+                <div id="overview-sort" class="mt-4 text-2xl font-bold">—</div>
+                <div class="mt-1 text-[10px] text-slate-500">
+                  Berdasarkan benchmark terakhir
+                </div>
+              </article>
+              <article class="glass rounded-2xl p-5">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] text-slate-400">Worker status</span
+                  ><i data-lucide="cpu" class="h-4 w-4 text-violet-300"></i>
+                </div>
+                <div class="mt-4 text-2xl font-bold text-mint">Ready</div>
+                <div class="mt-1 text-[10px] text-slate-500">
+                  UI tetap responsif saat kalkulasi
+                </div>
+              </article>
+            </div>
+            <div class="mt-5 grid gap-5 xl:grid-cols-[1.35fr_.65fr]">
+              <article class="glass rounded-2xl p-5 sm:p-6">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <div class="eyebrow">PERFORMANCE SNAPSHOT</div>
+                    <h2 class="mt-2 text-sm font-semibold">
+                      Leaderboard runtime
+                    </h2>
+                  </div>
+                  <span
+                    class="mono rounded-md border border-white/[.08] px-2 py-1 text-[9px] text-slate-500"
+                    >RANKING</span
+                  >
+                </div>
+                <div id="overview-ranking" class="mt-5 space-y-3">
+                  <div
+                    class="rounded-xl border border-dashed border-white/[.1] px-4 py-7 text-center text-xs text-slate-500"
+                  >
+                    Jalankan benchmark sorting untuk melihat peringkat runtime.
+                  </div>
+                </div>
+              </article>
+              <article class="glass rounded-2xl p-5 sm:p-6">
+                <div class="eyebrow">QUICK ACCESS</div>
+                <h2 class="mt-2 text-sm font-semibold">Ruang eksperimen</h2>
+                <div class="mt-4 space-y-3">
+                  <button
+                    data-goto="iteration"
+                    class="secondary-btn flex w-full items-center gap-3 rounded-xl p-3 text-left"
+                  >
+                    <span
+                      class="grid h-9 w-9 place-items-center rounded-lg bg-violet-400/10 text-violet-200"
+                      ><i data-lucide="git-branch" class="h-4 w-4"></i></span
+                    ><span
+                      ><span class="block text-[11px] font-semibold"
+                        >Iterasi vs Rekursi</span
+                      ><span class="mt-1 block text-[10px] text-slate-500"
+                        >Simulasi diskon bertingkat</span
+                      ></span
+                    ><i
+                      data-lucide="arrow-up-right"
+                      class="ml-auto h-4 w-4 text-slate-500"
+                    ></i>
+                  </button>
+                  <button
+                    data-goto="sorting"
+                    class="secondary-btn flex w-full items-center gap-3 rounded-xl p-3 text-left"
+                  >
+                    <span
+                      class="grid h-9 w-9 place-items-center rounded-lg bg-cyan/10 text-cyan"
+                      ><i
+                        data-lucide="chart-no-axes-combined"
+                        class="h-4 w-4"
+                      ></i></span
+                    ><span
+                      ><span class="block text-[11px] font-semibold"
+                        >Benchmark sorting</span
+                      ><span class="mt-1 block text-[10px] text-slate-500"
+                        >Quick, Merge & Insertion Sort</span
+                      ></span
+                    ><i
+                      data-lucide="arrow-up-right"
+                      class="ml-auto h-4 w-4 text-slate-500"
+                    ></i>
+                  </button>
+                </div>
+                <div
+                  class="mt-5 rounded-xl border border-mint/10 bg-mint/[.04] p-3.5"
+                >
+                  <div class="flex gap-2">
+                    <i
+                      data-lucide="lightbulb"
+                      class="mt-0.5 h-4 w-4 shrink-0 text-mint"
+                    ></i>
+                    <p class="text-[10px] leading-relaxed text-slate-400">
+                      Algoritma dengan kompleksitas lebih baik unggul saat
+                      volume transaksi meningkat.
+                    </p>
+                  </div>
+                </div>
+              </article>
+            </div>
+            <div class="glass mt-5 rounded-2xl p-5 sm:p-6">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div class="eyebrow">SYSTEM PIPELINE</div>
+                  <h2 class="mt-2 text-sm font-semibold">
+                    Dari transaksi ke insight
+                  </h2>
+                </div>
+                <span class="mono text-[9px] text-slate-500">3 LANGKAH</span>
+              </div>
+              <div class="mt-5 grid gap-3 md:grid-cols-3">
+                <div class="rounded-xl border border-white/[.06] p-4">
+                  <span class="mono text-[9px] text-violet-300"
+                    >01 / INPUT</span
+                  >
+                  <p class="mt-2 text-xs font-semibold">Dataset transaksi</p>
+                  <p class="mt-1 text-[10px] text-slate-500">
+                    Data disimpan lokal di browser.
+                  </p>
+                </div>
+                <div class="rounded-xl border border-white/[.06] p-4">
+                  <span class="mono text-[9px] text-cyan">02 / PROCESS</span>
+                  <p class="mt-2 text-xs font-semibold">Worker komputasi</p>
+                  <p class="mt-1 text-[10px] text-slate-500">
+                    Perhitungan berjalan di thread terpisah.
+                  </p>
+                </div>
+                <div class="rounded-xl border border-white/[.06] p-4">
+                  <span class="mono text-[9px] text-mint">03 / INSIGHT</span>
+                  <p class="mt-2 text-xs font-semibold">Analisis performa</p>
+                  <p class="mt-1 text-[10px] text-slate-500">
+                    Hasil disajikan sebagai ranking, meter, dan laporan.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="page-dataset" class="page">
+            <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <div class="eyebrow mb-2">DATA MANAGEMENT / 02</div>
+                <h1 class="text-2xl font-bold">Dataset transaksi</h1>
+                <p class="mt-2 text-xs text-slate-400">
+                  Kelola, cari, dan filter simulasi transaksi kasir.
+                </p>
+              </div>
+              <button
+                id="generate-btn"
+                class="primary-btn flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-bold"
+              >
+                <i data-lucide="sparkles" class="h-4 w-4"></i
+                ><span>Generate 100.000 data</span>
+              </button>
+            </div>
+            <div class="mb-5 grid gap-3 sm:grid-cols-3">
+              <div class="glass rounded-xl p-4">
+                <div class="text-[10px] text-slate-500">TOTAL RECORD</div>
+                <div id="dataset-count" class="mt-2 text-lg font-bold">0</div>
+              </div>
+              <div class="glass rounded-xl p-4">
+                <div class="text-[10px] text-slate-500">TOTAL PENJUALAN</div>
+                <div id="dataset-sales" class="mt-2 text-lg font-bold">Rp0</div>
+              </div>
+              <div class="glass rounded-xl p-4">
+                <div class="text-[10px] text-slate-500">STATUS DATA</div>
+                <div
+                  id="dataset-status"
+                  class="mt-2 flex items-center gap-2 text-sm font-semibold text-slate-400"
+                >
+                  <span class="h-1.5 w-1.5 rounded-full bg-slate-500"></span
+                  >Kosong
+                </div>
+              </div>
+            </div>
+            <div class="glass overflow-hidden rounded-2xl">
+              <div
+                class="flex flex-col gap-3 border-b border-white/[.06] p-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <h2 class="text-xs font-semibold">Riwayat transaksi</h2>
+                  <p class="mt-1 text-[10px] text-slate-500">
+                    Gunakan pencarian atau filter kategori untuk menemukan
+                    transaksi.
+                  </p>
+                </div>
+                <div class="grid gap-2 sm:grid-cols-[minmax(180px,1fr)_150px]">
+                  <label class="relative"
+                    ><i
+                      data-lucide="search"
+                      class="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500"
+                    ></i
+                    ><input
+                      id="search-input"
+                      class="input-dark rounded-lg py-2 pl-9 pr-3 text-[11px]"
+                      placeholder="Cari ID / produk..."
+                      aria-label="Cari transaksi" /></label
+                  ><select
+                    id="category-filter"
+                    class="input-dark rounded-lg px-3 py-2 text-[11px]"
+                    aria-label="Filter kategori"
+                  >
+                    <option value="">Semua kategori</option>
+                  </select>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="w-full min-w-[760px] text-left text-[11px]">
+                  <thead>
+                    <tr>
+                      <th class="px-5 py-3">ID transaksi</th>
+                      <th class="px-4 py-3">Produk</th>
+                      <th class="px-4 py-3">Kategori</th>
+                      <th class="px-4 py-3">Tanggal</th>
+                      <th class="px-4 py-3 text-right">Qty</th>
+                      <th class="px-5 py-3 text-right">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dataset-body"></tbody>
+                </table>
+                <div
+                  id="dataset-empty"
+                  class="px-5 py-14 text-center text-xs text-slate-500"
+                >
+                  Belum ada data. Generate dataset untuk memulai.
+                </div>
+              </div>
+              <div
+                class="flex flex-wrap items-center justify-between gap-3 border-t border-white/[.06] px-5 py-3"
+              >
+                <div id="pagination-info" class="text-[10px] text-slate-500">
+                  Menampilkan 0 data
+                </div>
+                <div class="flex items-center gap-2">
+                  <button
+                    id="prev-page"
+                    class="secondary-btn rounded-md px-3 py-1.5 text-[10px]"
+                    disabled
+                  >
+                    Sebelumnya</button
+                  ><span
+                    id="page-indicator"
+                    class="mono min-w-[56px] text-center text-[10px] text-slate-400"
+                    >0 / 0</span
+                  ><button
+                    id="next-page"
+                    class="secondary-btn rounded-md px-3 py-1.5 text-[10px]"
+                    disabled
+                  >
+                    Berikutnya
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div
+              id="dataset-progress-wrap"
+              class="glass mt-4 hidden rounded-xl p-4"
+            >
+              <div class="flex justify-between text-[10px]">
+                <span id="dataset-progress-label" class="text-slate-300"
+                  >Menyiapkan data…</span
+                ><span id="dataset-progress-value" class="mono text-cyan"
+                  >0%</span
+                >
+              </div>
+              <div class="bar-track mt-3">
+                <div
+                  id="dataset-progress-bar"
+                  class="bar-fill"
+                  style="width: 0%"
+                ></div>
+              </div>
+            </div>
+          </section>
+
+          <section id="page-iteration" class="page">
+            <div class="mb-6">
+              <div class="eyebrow mb-2">ALGORITHM STUDY / 03</div>
+              <h1 class="text-2xl font-bold">
+                Iterasi <span class="text-slate-500">vs</span> Rekursi
+              </h1>
+              <p class="mt-2 max-w-2xl text-xs leading-relaxed text-slate-400">
+                Simulasikan diskon bertingkat pada struk kasir. Kedua pendekatan
+                menghitung subtotal yang sama; worker mengukur waktu eksekusinya
+                tanpa memblokir antarmuka.
+              </p>
+            </div>
+            <div class="grid gap-5 xl:grid-cols-[.72fr_1.28fr]">
+              <div class="glass h-fit rounded-2xl p-5 sm:p-6">
+                <div class="eyebrow">SIMULATION INPUT</div>
+                <h2 class="mt-2 text-sm font-semibold">
+                  Konfigurasi perhitungan
+                </h2>
+                <label
+                  class="mt-5 block text-[10px] text-slate-400"
+                  for="discount-base"
+                  >Subtotal belanja (Rp)</label
+                ><input
+                  id="discount-base"
+                  class="input-dark mt-2 rounded-lg px-3 py-2.5 text-sm"
+                  type="number"
+                  min="1000"
+                  max="100000000"
+                  value="250000"
+                /><label
+                  class="mt-4 block text-[10px] text-slate-400"
+                  for="discount-levels"
+                  >Jumlah tingkat diskon</label
+                ><input
+                  id="discount-levels"
+                  class="input-dark mt-2 rounded-lg px-3 py-2.5 text-sm"
+                  type="number"
+                  min="1"
+                  max="40"
+                  value="8"
+                />
+                <p class="mt-2 text-[10px] leading-relaxed text-slate-500">
+                  Diskon menurun dari 15% hingga 1%, diterapkan berurutan pada
+                  sisa subtotal. Kedalaman rekursi dibatasi maksimal 40 tingkat.
+                </p>
+                <button
+                  id="run-iteration"
+                  class="primary-btn mt-5 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-xs font-bold"
+                >
+                  <i data-lucide="play" class="h-4 w-4"></i>Jalankan
+                  perbandingan
+                </button>
+                <div
+                  class="mt-4 rounded-lg border border-white/[.06] bg-white/[.02] p-3"
+                >
+                  <div
+                    class="flex items-center gap-2 text-[10px] font-semibold text-slate-300"
+                  >
+                    <i data-lucide="info" class="h-3.5 w-3.5 text-cyan"></i
+                    >Model perhitungan
+                  </div>
+                  <code
+                    class="mono mt-2 block text-[10px] leading-relaxed text-slate-500"
+                    >subtotal[n] = subtotal[n-1] × (1 − diskon[n])</code
+                  >
+                </div>
+              </div>
+              <div class="space-y-5">
+                <article class="glass rounded-2xl p-5 sm:p-6">
+                  <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <div class="eyebrow">SPEED TEST / RUNTIME</div>
+                      <h2 class="mt-2 text-sm font-semibold">
+                        Uji kecepatan perhitungan
+                      </h2>
+                      <p class="mt-1 text-[10px] text-slate-500">
+                        Meter bergerak saat hasil terukur diputar ulang · 10.000
+                        kalkulasi per metode
+                      </p>
+                    </div>
+                    <span
+                      id="speedtest-status"
+                      class="mono rounded-full border border-white/[.08] px-2.5 py-1 text-[9px] text-slate-500"
+                      >SIAP DIUJI</span
+                    >
+                  </div>
+                  <div class="mt-5 grid gap-5 sm:grid-cols-2">
+                    <div
+                      class="rounded-2xl border border-cyan/10 bg-cyan/[.025] p-4 sm:p-5"
+                    >
+                      <div class="mb-4 flex items-center justify-between">
+                        <span
+                          class="flex items-center gap-2 text-[10px] font-semibold tracking-wider text-cyan"
+                          ><span class="h-2 w-2 rounded-full bg-cyan"></span
+                          >ITERATIF</span
+                        ><span
+                          id="iterative-speed-state"
+                          class="speedtest-state mono text-[8px] text-slate-600"
+                          >MENUNGGU</span
+                        >
+                      </div>
+                      <div
+                        class="mx-auto speedtest-dial"
+                        id="iterative-dial"
+                        role="img"
+                        aria-label="Meter kecepatan iteratif"
+                        style="--dial-color: #4de1df"
+                      >
+                        <div class="speedtest-center">
+                          <span
+                            id="iterative-time"
+                            class="mono text-base font-bold text-white sm:text-lg"
+                            >—</span
+                          ><span
+                            class="mt-1 text-[8px] tracking-wider text-slate-500"
+                            >WAKTU EKSEKUSI</span
+                          >
+                        </div>
+                      </div>
+                      <div
+                        id="iterative-result"
+                        class="mt-4 text-center text-[10px] text-slate-400"
+                      >
+                        Hasil subtotal: —
+                      </div>
+                      <div
+                        id="iterative-runs"
+                        class="mt-1 text-center text-[9px] text-slate-600"
+                      >
+                        10.000 kalkulasi
+                      </div>
+                      <div
+                        class="mt-3 flex justify-between border-t border-white/[.06] pt-3 text-[10px] text-slate-500"
+                      >
+                        <span>Memori ekstra</span
+                        ><span id="iterative-memory" class="mono text-cyan"
+                          >O(1)</span
+                        >
+                      </div>
+                    </div>
+                    <div
+                      class="rounded-2xl border border-violet-300/10 bg-violet-300/[.025] p-4 sm:p-5"
+                    >
+                      <div class="mb-4 flex items-center justify-between">
+                        <span
+                          class="flex items-center gap-2 text-[10px] font-semibold tracking-wider text-violet-200"
+                          ><span
+                            class="h-2 w-2 rounded-full bg-violet-300"
+                          ></span
+                          >REKURSIF</span
+                        ><span
+                          id="recursive-speed-state"
+                          class="speedtest-state mono text-[8px] text-slate-600"
+                          >MENUNGGU</span
+                        >
+                      </div>
+                      <div
+                        class="mx-auto speedtest-dial"
+                        id="recursive-dial"
+                        role="img"
+                        aria-label="Meter kecepatan rekursif"
+                        style="--dial-color: #a296ff"
+                      >
+                        <div class="speedtest-center">
+                          <span
+                            id="recursive-time"
+                            class="mono text-base font-bold text-white sm:text-lg"
+                            >—</span
+                          ><span
+                            class="mt-1 text-[8px] tracking-wider text-slate-500"
+                            >WAKTU EKSEKUSI</span
+                          >
+                        </div>
+                      </div>
+                      <div
+                        id="recursive-result"
+                        class="mt-4 text-center text-[10px] text-slate-400"
+                      >
+                        Hasil subtotal: —
+                      </div>
+                      <div
+                        id="recursive-runs"
+                        class="mt-1 text-center text-[9px] text-slate-600"
+                      >
+                        10.000 kalkulasi
+                      </div>
+                      <div
+                        class="mt-3 flex justify-between border-t border-white/[.06] pt-3 text-[10px] text-slate-500"
+                      >
+                        <span>Call stack</span
+                        ><span
+                          id="recursive-memory"
+                          class="mono text-violet-200"
+                          >O(n)</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/[.06] bg-black/10 px-3 py-2.5"
+                  >
+                    <span class="text-[9px] text-slate-500"
+                      >Kecepatan relatif meter dinormalisasi: metode tercepat =
+                      100%</span
+                    ><span
+                      id="speedtest-winner"
+                      class="mono text-[9px] text-slate-500"
+                      >Jalankan tes untuk melihat hasil</span
+                    >
+                  </div>
+                </article>
+                <article class="glass rounded-2xl p-5">
+                  <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <div class="eyebrow">STEP VISUALIZER</div>
+                      <h2 class="mt-2 text-xs font-semibold">Jejak eksekusi</h2>
+                    </div>
+                    <div class="flex gap-3 text-[9px] text-slate-500">
+                      <span class="flex items-center gap-1"
+                        ><i class="h-1.5 w-1.5 rounded-full bg-cyan"></i
+                        >Loop</span
+                      ><span class="flex items-center gap-1"
+                        ><i class="h-1.5 w-1.5 rounded-full bg-violet-300"></i
+                        >Stack</span
+                      >
+                    </div>
+                  </div>
+                  <div class="mt-4 grid gap-4 md:grid-cols-2">
+                    <div>
+                      <div
+                        class="mb-2 flex items-center justify-between text-[10px]"
+                      >
+                        <span class="text-slate-300">Perulangan</span
+                        ><span id="loop-step-label" class="mono text-cyan"
+                          >menunggu</span
+                        >
+                      </div>
+                      <div
+                        id="loop-visualizer"
+                        class="flex min-h-[136px] flex-wrap content-start gap-1.5 rounded-xl border border-white/[.06] bg-black/10 p-3"
+                      >
+                        <span class="m-auto text-[10px] text-slate-600"
+                          >Jalankan simulasi untuk melihat langkah</span
+                        >
+                      </div>
+                    </div>
+                    <div>
+                      <div
+                        class="mb-2 flex items-center justify-between text-[10px]"
+                      >
+                        <span class="text-slate-300">Call stack rekursif</span
+                        ><span
+                          id="stack-step-label"
+                          class="mono text-violet-200"
+                          >menunggu</span
+                        >
+                      </div>
+                      <div
+                        id="stack-visualizer"
+                        class="flex min-h-[136px] flex-col-reverse gap-1 overflow-hidden rounded-xl border border-white/[.06] bg-black/10 p-3"
+                      >
+                        <span class="m-auto text-[10px] text-slate-600"
+                          >Frame fungsi tampil bertahap</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </article>
+                <article class="glass rounded-2xl p-5">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <div class="eyebrow">COMPLEXITY PROFILE</div>
+                      <h2 class="mt-2 text-xs font-semibold">
+                        Analisis pertumbuhan
+                      </h2>
+                    </div>
+                    <span
+                      class="mono rounded-md border border-white/[.08] px-2 py-1 text-[9px] text-slate-500"
+                      >n = tingkat diskon</span
+                    >
+                  </div>
+                  <div class="mt-4 grid gap-4 lg:grid-cols-[1fr_1fr]">
+                    <div
+                      class="table-wrap rounded-lg border border-white/[.06]"
+                    >
+                      <table class="w-full min-w-[440px] text-left text-[10px]">
+                        <thead>
+                          <tr>
+                            <th class="px-3 py-2">Pendekatan</th>
+                            <th class="px-3 py-2 text-right">Waktu</th>
+                            <th class="px-3 py-2 text-right">Memori / Stack</th>
+                            <th class="px-3 py-2 text-right">Big-O waktu</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td class="px-3 py-3 font-semibold text-cyan">
+                              Iteratif
+                            </td>
+                            <td
+                              id="iter-table-time"
+                              class="mono px-3 py-3 text-right text-slate-300"
+                            >
+                              —
+                            </td>
+                            <td
+                              id="iter-table-memory"
+                              class="mono px-3 py-3 text-right text-slate-300"
+                            >
+                              O(1)
+                            </td>
+                            <td class="mono px-3 py-3 text-right text-cyan">
+                              O(n)
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="px-3 py-3 font-semibold text-violet-200">
+                              Rekursif
+                            </td>
+                            <td
+                              id="rec-table-time"
+                              class="mono px-3 py-3 text-right text-slate-300"
+                            >
+                              —
+                            </td>
+                            <td
+                              id="rec-table-memory"
+                              class="mono px-3 py-3 text-right text-slate-300"
+                            >
+                              O(n)
+                            </td>
+                            <td
+                              class="mono px-3 py-3 text-right text-violet-200"
+                            >
+                              O(n)
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div
+                      id="iteration-comparison"
+                      class="rounded-xl border border-white/[.06] bg-white/[.025] p-4"
+                    >
+                      <div
+                        class="mono text-[9px] tracking-wider text-slate-500"
+                      >
+                        HASIL PERBANDINGAN
+                      </div>
+                      <p class="mt-3 text-xs leading-relaxed text-slate-500">
+                        Jalankan simulasi untuk melihat pendekatan yang lebih
+                        cepat. Kompleksitas waktu keduanya O(n); iteratif
+                        memakai memori O(1), rekursif memakai stack O(n).
+                      </p>
+                    </div>
+                  </div>
+                  <div class="mt-3 grid gap-2 sm:grid-cols-3">
+                    <div class="rounded-lg bg-white/[.025] p-3">
+                      <div class="text-[9px] text-slate-500">
+                        WAKTU ITERATIF
+                      </div>
+                      <div class="mono mt-1 text-xs text-cyan">O(n)</div>
+                    </div>
+                    <div class="rounded-lg bg-white/[.025] p-3">
+                      <div class="text-[9px] text-slate-500">
+                        WAKTU REKURSIF
+                      </div>
+                      <div class="mono mt-1 text-xs text-violet-200">O(n)</div>
+                    </div>
+                    <div class="rounded-lg bg-white/[.025] p-3">
+                      <div class="text-[9px] text-slate-500">
+                        MEMORI TAMBAHAN
+                      </div>
+                      <div class="mono mt-1 text-xs text-slate-200">
+                        O(1) vs O(n)
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </section>
+
+          <section id="page-sorting" class="page">
+            <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <div class="eyebrow mb-2">SORTING LAB / 04</div>
+                <h1 class="text-2xl font-bold">Benchmark sorting</h1>
+                <p
+                  class="mt-2 max-w-2xl text-xs leading-relaxed text-slate-400"
+                >
+                  Ukur waktu pengurutan nominal transaksi. Quick Sort dan Merge
+                  Sort memproses seluruh dataset; Insertion Sort menggunakan
+                  sampel aman maksimal 5.000 elemen.
+                </p>
+              </div>
+              <button
+                id="run-sorting"
+                class="primary-btn flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-bold"
+              >
+                <i data-lucide="play" class="h-4 w-4"></i>Mulai benchmark
+              </button>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-3">
+              <article class="glass rounded-xl p-4">
+                <div class="flex items-center gap-2 text-[10px] text-slate-400">
+                  <span class="h-2 w-2 rounded-full bg-violet-300"></span>QUICK
+                  SORT
+                </div>
+                <div class="mono mt-3 text-xs text-slate-200">
+                  O(n log n) rata-rata
+                </div>
+                <div class="mt-1 text-[10px] text-slate-500">
+                  In-place · stack iteratif
+                </div>
+              </article>
+              <article class="glass rounded-xl p-4">
+                <div class="flex items-center gap-2 text-[10px] text-slate-400">
+                  <span class="h-2 w-2 rounded-full bg-cyan"></span>MERGE SORT
+                </div>
+                <div class="mono mt-3 text-xs text-slate-200">O(n log n)</div>
+                <div class="mt-1 text-[10px] text-slate-500">
+                  Stabil · memori O(n)
+                </div>
+              </article>
+              <article class="glass rounded-xl p-4">
+                <div class="flex items-center gap-2 text-[10px] text-slate-400">
+                  <span class="h-2 w-2 rounded-full bg-amber-300"></span
+                  >INSERTION SORT
+                </div>
+                <div class="mono mt-3 text-xs text-slate-200">
+                  O(n²) rata-rata
+                </div>
+                <div class="mt-1 text-[10px] text-slate-500">
+                  Sampel dibatasi 5.000 elemen
+                </div>
+              </article>
+            </div>
+            <div
+              id="sorting-progress-card"
+              class="glass winner-glow relative mt-5 hidden overflow-hidden rounded-2xl p-5 sm:p-7"
+              role="status"
+              aria-live="polite"
+            >
+              <div
+                class="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-violet-500/[.08] blur-3xl"
+              ></div>
+              <div
+                class="relative grid items-center gap-6 sm:grid-cols-[auto_1fr]"
+              >
+                <div class="mx-auto grid h-36 w-36 place-items-center sm:mx-0">
+                  <div
+                    class="sort-loader-orbit relative grid h-32 w-32 place-items-center rounded-full border border-cyan/20"
+                  >
+                    <span
+                      class="absolute -top-1 left-1/2 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-cyan shadow-[0_0_14px_#4de1df]"
+                    ></span>
+                    <span
+                      class="sort-loader-ring absolute inset-2 rounded-full border-2 border-transparent border-t-violet-300 border-r-cyan/70"
+                    ></span>
+                    <span
+                      class="absolute inset-5 rounded-full border border-white/[.06]"
+                    ></span>
+                    <div
+                      class="sort-loader-pulse grid h-20 w-20 place-items-center rounded-full border border-cyan/15 bg-[#0c1425] shadow-[0_0_32px_rgba(77,225,223,.12)]"
+                    >
+                      <i data-lucide="cpu" class="h-7 w-7 text-cyan"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="min-w-0 text-center sm:text-left">
+                  <div
+                    class="eyebrow flex items-center justify-center gap-2 sm:justify-start"
+                  >
+                    <span
+                      class="h-1.5 w-1.5 animate-pulse rounded-full bg-mint"
+                    ></span
+                    >BENCHMARK SEDANG BERJALAN
+                  </div>
+                  <h2
+                    id="sorting-progress-label"
+                    class="mt-2 text-base font-bold sm:text-lg"
+                  >
+                    Menguji data transaksi
+                  </h2>
+                  <p
+                    id="sorting-worker-note"
+                    class="mt-2 text-[11px] leading-relaxed text-slate-400"
+                  >
+                    Komputasi berjalan di Web Worker agar halaman tetap
+                    responsif.
+                  </p>
+                  <div
+                    class="mt-4 flex flex-wrap items-center justify-center gap-2 sm:justify-start"
+                  >
+                    <span
+                      class="rounded-lg border border-violet-300/15 bg-violet-300/[.05] px-2.5 py-1.5 text-[9px] text-violet-200"
+                      >Quick Sort</span
+                    >
+                    <span
+                      class="rounded-lg border border-cyan/15 bg-cyan/[.05] px-2.5 py-1.5 text-[9px] text-cyan"
+                      >Merge Sort</span
+                    >
+                    <span
+                      class="rounded-lg border border-amber-300/15 bg-amber-300/[.05] px-2.5 py-1.5 text-[9px] text-amber-200"
+                      >Insertion Sort · sampel</span
+                    >
+                    <span
+                      class="mono rounded-lg border border-white/[.08] px-2.5 py-1.5 text-[9px] text-slate-300"
+                      >Waktu: <span id="sorting-loading-time">00:00</span></span
+                    >
+                  </div>
+                </div>
+              </div>
+              <div
+                class="relative mt-6 overflow-hidden rounded-full bg-white/[.06]"
+              >
+                <div
+                  class="sort-loader-bar h-1.5 w-1/3 rounded-full bg-gradient-to-r from-violet-400 via-cyan to-mint shadow-[0_0_12px_rgba(77,225,223,.35)]"
+                ></div>
+              </div>
+              <div
+                class="sort-signal relative mx-auto mt-5 flex h-8 max-w-xs items-center justify-center gap-1"
+              >
+                <span class="h-3 w-1 rounded-full bg-violet-300"></span
+                ><span class="h-5 w-1 rounded-full bg-violet-300"></span
+                ><span class="h-7 w-1 rounded-full bg-cyan"></span
+                ><span class="h-4 w-1 rounded-full bg-cyan"></span
+                ><span class="h-6 w-1 rounded-full bg-mint"></span
+                ><span class="h-3 w-1 rounded-full bg-mint"></span
+                ><span class="h-5 w-1 rounded-full bg-cyan"></span
+                ><span class="h-7 w-1 rounded-full bg-violet-300"></span
+                ><span class="h-4 w-1 rounded-full bg-violet-300"></span>
+              </div>
+              <p class="relative mt-3 text-center text-[9px] text-slate-500">
+                Animasi loading ditampilkan minimal 3 detik · durasi ini tidak
+                masuk ke waktu benchmark
+              </p>
+            </div>
+            <div
+              id="sorting-verdict"
+              class="glass winner-glow mt-5 hidden rounded-2xl border-mint/20 p-5 sm:p-6"
+              aria-live="polite"
+            ></div>
+            <div class="mt-5 grid gap-5 xl:grid-cols-[1.1fr_.9fr]">
+              <article class="glass overflow-hidden rounded-2xl">
+                <div class="border-b border-white/[.06] p-5">
+                  <div class="eyebrow">BENCHMARK RESULT</div>
+                  <h2 class="mt-2 text-sm font-semibold">
+                    Hasil pengukuran & status
+                  </h2>
+                  <p class="mt-1 text-[10px] text-slate-500">
+                    Pemenang hanya ditetapkan pada algoritma yang menguji jumlah
+                    data yang sama.
+                  </p>
+                </div>
+                <div class="table-wrap">
+                  <table class="w-full min-w-[650px] text-left text-[11px]">
+                    <thead>
+                      <tr>
+                        <th class="px-5 py-3">Algoritma</th>
+                        <th class="px-3 py-3 text-right">Data uji</th>
+                        <th class="px-3 py-3 text-right">Waktu</th>
+                        <th class="px-3 py-3 text-right">Efisiensi</th>
+                        <th class="px-5 py-3 text-right">Kompleksitas</th>
+                      </tr>
+                    </thead>
+                    <tbody id="sorting-results">
+                      <tr>
+                        <td
+                          colspan="5"
+                          class="px-5 py-12 text-center text-slate-500"
+                        >
+                          Belum ada hasil benchmark.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+              <article class="glass rounded-2xl p-5 sm:p-6">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="eyebrow">RUNTIME LEADERBOARD</div>
+                    <h2 class="mt-2 text-sm font-semibold">
+                      Skor kecepatan relatif
+                    </h2>
+                  </div>
+                  <span class="mono text-[9px] text-slate-500"
+                    >TERBAIK = 100%</span
+                  >
+                </div>
+                <p class="mt-2 text-[10px] leading-relaxed text-slate-500">
+                  Skor dihitung dari waktu algoritma terhadap waktu tercepat
+                  pada jumlah data yang sama. Bar lebih panjang berarti runtime
+                  lebih efisien.
+                </p>
+                <div id="sorting-ranking" class="mt-5 space-y-4">
+                  <div
+                    class="rounded-xl border border-dashed border-white/[.1] px-4 py-8 text-center text-xs text-slate-500"
+                  >
+                    Jalankan benchmark untuk membuat leaderboard.
+                  </div>
+                </div>
+              </article>
+            </div>
+            <p class="mt-4 text-[10px] leading-relaxed text-slate-500">
+              Catatan perbandingan: Quick Sort dan Merge Sort diuji pada seluruh
+              100.000 data. Insertion Sort dibatasi pada sampel 5.000 data
+              karena kompleksitas kuadratiknya; runtime sampel tersebut
+              ditampilkan sebagai informasi saja dan tidak dipakai menentukan
+              pemenang uji 100.000 data.
+            </p>
+          </section>
+
+          <section id="page-report" class="page">
+            <div class="mb-6">
+              <div class="eyebrow mb-2">INSIGHT & CONCLUSION / 05</div>
+              <h1 class="text-2xl font-bold">Analisis & laporan</h1>
+              <p class="mt-2 text-xs text-slate-400">
+                Ringkasan hasil eksperimen dan penerapan konsep fungsi-prosedur
+                pada arsitektur aplikasi.
+              </p>
+            </div>
+            <div class="grid gap-5 xl:grid-cols-[1fr_.9fr]">
+              <article class="glass rounded-2xl p-5 sm:p-6">
+                <div class="eyebrow">ITERATION VS RECURSION</div>
+                <h2 class="mt-2 text-sm font-semibold">
+                  Diskon bertingkat di kasir
+                </h2>
+                <div
+                  id="report-iteration"
+                  class="mt-4 rounded-xl border border-white/[.06] bg-white/[.02] p-4 text-[11px] leading-relaxed text-slate-400"
+                >
+                  Jalankan simulasi iterasi vs rekursi untuk mengisi laporan
+                  dengan hasil aktual.
+                </div>
+                <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div
+                    class="rounded-xl border border-cyan/10 bg-cyan/[.035] p-4"
+                  >
+                    <div class="mono text-[9px] text-cyan">ITERATIF</div>
+                    <p class="mt-2 text-[10px] leading-relaxed text-slate-400">
+                      Loop memperbarui subtotal pada setiap tingkat diskon.
+                      Memori tambahan konstan, cocok untuk kalkulasi berulang.
+                    </p>
+                  </div>
+                  <div
+                    class="rounded-xl border border-violet-300/10 bg-violet-300/[.035] p-4"
+                  >
+                    <div class="mono text-[9px] text-violet-200">REKURSIF</div>
+                    <p class="mt-2 text-[10px] leading-relaxed text-slate-400">
+                      Setiap fungsi memproses satu tingkat lalu memanggil
+                      tingkat berikutnya. Bentuknya deklaratif, tetapi call
+                      stack tumbuh seiring n.
+                    </p>
+                  </div>
+                </div>
+              </article>
+              <article class="glass rounded-2xl p-5 sm:p-6">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="eyebrow">SORTING ANALYSIS</div>
+                    <h2 class="mt-2 text-sm font-semibold">
+                      Kesimpulan benchmark
+                    </h2>
+                  </div>
+                  <i data-lucide="trending-up" class="h-4 w-4 text-mint"></i>
+                </div>
+                <div
+                  id="report-sorting"
+                  class="mt-4 rounded-xl border border-white/[.06] bg-white/[.02] p-4 text-[11px] leading-relaxed text-slate-400"
+                >
+                  Jalankan benchmark sorting untuk membuat kesimpulan dari data
+                  aktual.
+                </div>
+                <div class="mt-4 border-t border-white/[.06] pt-4">
+                  <div class="mono text-[9px] tracking-wider text-slate-500">
+                    RINGKASAN PERFORMA
+                  </div>
+                  <div id="report-ranking" class="mt-3 space-y-3">
+                    <div class="text-[10px] text-slate-500">
+                      Belum ada hasil benchmark untuk dirangkum.
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </div>
+            <article class="glass mt-5 rounded-2xl p-5 sm:p-6">
+              <div class="eyebrow">ARCHITECTURE CONCEPT</div>
+              <h2 class="mt-2 text-sm font-semibold">
+                “Fungsi memanggil prosedur atau prosedur memanggil fungsi”
+              </h2>
+              <p
+                class="mt-3 max-w-4xl text-[11px] leading-relaxed text-slate-400"
+              >
+                Pada aplikasi ini, event handler UI bertindak sebagai prosedur
+                pengendali: ia memvalidasi input, mengirim pesan
+                <code class="mono text-cyan">postMessage()</code> ke Web Worker,
+                lalu merender hasil saat menerima balasan. Di worker, prosedur
+                <code class="mono text-violet-200">handleMessage</code>
+                memanggil fungsi perhitungan (diskon iteratif/rekursif atau
+                sorting). Pada algoritma rekursif, fungsi memanggil dirinya
+                sendiri hingga kondisi dasar terpenuhi. Hasil kembali melalui
+                pesan worker, kemudian prosedur UI memperbarui tabel,
+                visualisasi, leaderboard, dan laporan.
+              </p>
+              <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                <div class="rounded-xl border border-white/[.06] p-4">
+                  <div class="mono text-[9px] text-violet-200">
+                    01 · PROCEDURE
+                  </div>
+                  <p class="mt-2 text-[10px] font-semibold">Event handler</p>
+                  <p class="mt-1 text-[10px] text-slate-500">
+                    Validasi input & kirim instruksi
+                  </p>
+                </div>
+                <div class="rounded-xl border border-white/[.06] p-4">
+                  <div class="mono text-[9px] text-cyan">02 · FUNCTION</div>
+                  <p class="mt-2 text-[10px] font-semibold">
+                    Worker computation
+                  </p>
+                  <p class="mt-1 text-[10px] text-slate-500">
+                    Kalkulasi mandiri di thread terpisah
+                  </p>
+                </div>
+                <div class="rounded-xl border border-white/[.06] p-4">
+                  <div class="mono text-[9px] text-mint">03 · CALLBACK</div>
+                  <p class="mt-2 text-[10px] font-semibold">Render insight</p>
+                  <p class="mt-1 text-[10px] text-slate-500">
+                    Tampilkan hasil & interpretasi
+                  </p>
+                </div>
+              </div>
+            </article>
+          </section>
+          <footer
+            class="mt-8 flex flex-wrap items-center justify-between gap-2 border-t border-white/[.06] pt-4 text-[9px] text-slate-600"
+          >
+            <span>Kasir Pintar · Algorithm Lab</span
+            ><span class="mono">HTML · CSS · JAVASCRIPT · WEB WORKER</span>
+          </footer>
+        </div>
+      </main>
+    </div>
+    <div
+      id="toast-region"
+      class="pointer-events-none fixed bottom-4 right-4 z-50 space-y-2"
+      aria-live="polite"
+    ></div>
+    <script src="script.js"></script>
+  </body>
+</html>
